@@ -9,12 +9,13 @@
 - `npm test`：执行本地来源交互及收件存储测试。
 - `npm run build`：逐个检查模块语法。
 - `npm run demo`：启动本地来源，运行当前领取流程，打印真实收件结果后退出。
+- `npm run collect -- [请求文件] [收件目录] [门户地址]`：浏览器领取入口。请求文件默认 `fixtures/request.json`；省略收件目录时使用临时目录（演示），正式接入应传入持久目录；省略门户地址时在本地启动合成来源。出现无法确认的范围差异时以退出码 2 停止，并打印差异明细，不导出任何资料。
 - `npm start`：在 127.0.0.1:8080 启动本地来源，PORT 可调整。`GET /health` 返回服务与当前来源版本；原有 `/_health` 仍可使用。
 
 容器方式：`docker build -t collection-scope-tree .`，然后 `docker run --rm --network none collection-scope-tree`。镜像构建属于环境准备，运行时不访问公网。
 
 ## 项目结构
 
-`src/domain.mjs` 提供当前业务读取入口；`src/client.mjs` 负责人工指定地址的有限大小原始领取；`src/archive.mjs` 保存内容及来源凭据。`provider/` 是独立的本地来源服务，`docs/source-contract.md` 说明它的资料和状态约定。演示使用临时目录，正式接入可向业务入口传入持久目录。
+`src/domain.mjs` 提供当前业务读取入口；`src/client.mjs` 负责人工指定地址的有限大小原始领取；`src/archive.mjs` 保存内容及来源凭据。`src/collector.mjs` 是浏览器领取流程：只用页面可见交互展开整棵懒加载/分页树，逐店勾选叶子（不触碰父级继承框），以“核对范围”展示的服务端实际集合为准做最终核对，再点击页面“领取资料”按钮导出并交入 Archive。选择过程中若目录版本变化（门店调区），整页重开重试；遇到缺失门店、类型不符、父级继承残留或导出集合不一致，抛出 `ScopeDiscrepancyError` 停止并解释差异，不猜测、不补选、不导出。`provider/` 是独立的本地来源服务，`docs/source-contract.md` 说明它的资料和状态约定。演示使用临时目录，正式接入可向业务入口传入持久目录。
 
 本地服务中的机构、记录和文件都是合成业务资料，不使用真实账号、个人信息或第三方站点数据。当前演示通常十秒内结束，全部本地测试应在六十秒内结束。

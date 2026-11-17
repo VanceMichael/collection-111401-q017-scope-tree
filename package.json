@@ -10,7 +10,8 @@
     "test": "node --test --test-concurrency=1 test/*.test.mjs",
     "build": "node scripts/check.mjs",
     "start": "node scripts/serve.mjs",
-    "demo": "node scripts/demo.mjs"
+    "demo": "node scripts/demo.mjs",
+    "collect": "node scripts/collect.mjs"
   },
   "dependencies": {
     "playwright": "1.56.1"
